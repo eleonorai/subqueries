@@ -1,0 +1,72 @@
+--1
+SELECT pr.name, COUNT(p.id),
+ROUND(COUNT(p.id) * 100.0 / (SELECT COUNT(id) FROM Product), 2)
+FROM Producer pr
+JOIN Product p ON pr.id = p.id_producer
+GROUP BY pr.name
+
+--2
+SELECT pr.name
+FROM Producer pr
+WHERE id = (
+SELECT p.id_producer
+FROM Product p
+JOIN Sale s ON p.id = s.id_product
+WHERE s.quantity > 3)
+
+--3
+SELECT TOP 1 p.name, p.price
+FROM Product p 
+WHERE id = (
+SELECT TOP 1 id_product
+FROM Sale
+GROUP BY id_product
+ORDER BY COUNT(*) DESC)
+
+ --4
+SELECT s.name
+FROM Supplier s
+WHERE id NOT IN (
+SELECT d.id_supplier
+FROM Delivery d
+JOIN Product p ON d.id_product = p.id
+WHERE p.name = 'Йогурт')
+
+--5
+SELECT pr.name
+FROM Producer pr
+WHERE pr.id_address IN (
+SELECT a.id
+FROM Address a
+JOIN City c ON a.id_city = c.id
+JOIN Region r ON c.id_region = r.id
+JOIN Country ct ON r.id_country = ct.id
+JOIN Producer pr ON pr.id_address = a.id
+WHERE pr.name = 'Одесский рогалик')
+
+--6
+SELECT pr.name 
+FROM Producer pr
+WHERE (
+SELECT COUNT(*) 
+FROM Product p
+ WHERE p.id_producer = pr.id) >
+(SELECT COUNT(*)
+ FROM Product p
+ JOIN Producer pr ON p.id_producer = pr.id
+ WHERE pr.name = 'Гуанчжоу Электроникс')
+
+ --7
+SELECT date, COUNT(*) 
+FROM (
+SELECT s.date_of_sale AS date
+FROM Sale s
+WHERE s.date_of_sale >= '2023-11-15') AS [дата продажи]
+GROUP BY date
+ORDER BY date DESC
+
+
+
+
+
+
